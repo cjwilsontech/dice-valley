@@ -1,0 +1,7 @@
+[package]
+name = "dice-valley"
+default-run = "dice-valley"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
