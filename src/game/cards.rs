@@ -18,6 +18,24 @@ pub enum CardKind {
     BusinessCenter,
 }
 
+pub const ALL_CARDS: [CardKind; CARD_KIND_COUNT] = [
+    CardKind::AppleOrchard,
+    CardKind::Bakery,
+    CardKind::BusinessCenter,
+    CardKind::Cafe,
+    CardKind::CheeseFactory,
+    CardKind::ConvenienceStore,
+    CardKind::FamilyRestaurant,
+    CardKind::Forest,
+    CardKind::FruitAndVegetableMarket,
+    CardKind::FurnitureFactory,
+    CardKind::Mine,
+    CardKind::Ranch,
+    CardKind::Stadium,
+    CardKind::TvStation,
+    CardKind::WheatField,
+];
+
 #[derive(PartialEq, PartialOrd)]
 pub enum CardOrder {
     Restaurants = 0,
