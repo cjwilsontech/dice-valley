@@ -3,10 +3,9 @@ pub enum PlayerType {
     Human,
 }
 
-pub fn get_player_type_name(player_type: &Option<PlayerType>) -> &'static str {
+pub fn get_player_type_name(player_type: &PlayerType) -> &'static str {
     match player_type {
-        Some(PlayerType::Computer) => "Computer",
-        Some(PlayerType::Human) => "Human",
-        None => "None",
+        PlayerType::Computer => "Computer",
+        PlayerType::Human => "Human",
     }
 }
