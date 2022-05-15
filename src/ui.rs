@@ -11,9 +11,10 @@ pub fn get_players() -> (Vec<Player>, usize) {
     let player_count = get_player_count();
     let mut players = Vec::new();
 
-    for i in 0..player_count {
-        let name = get_player_name(i + 1);
+    for turn in 0..player_count {
+        let name = get_player_name(turn + 1);
         players.push(Player {
+            turn,
             name,
             kind: get_player_kind(),
             cards: create_player_deck(),

@@ -1,13 +1,16 @@
-use super::controller::Deck;
+use super::{cards::CardStack, controller::Deck};
 
+#[derive(Clone)]
 pub enum PlayerKind {
     Computer,
     Human,
 }
 
+#[derive(Clone)]
 pub struct Player {
     pub name: String,
     pub kind: PlayerKind,
+    pub turn: usize,
     pub cards: Deck,
     pub coins: u8,
 }

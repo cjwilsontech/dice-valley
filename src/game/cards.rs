@@ -1,5 +1,6 @@
 pub const CARD_KIND_COUNT: usize = 15;
 
+#[derive(Debug, PartialEq, Clone, Copy)]
 pub enum CardKind {
     WheatField,
     Ranch,
@@ -36,7 +37,7 @@ pub const ALL_CARDS: [CardKind; CARD_KIND_COUNT] = [
     CardKind::WheatField,
 ];
 
-#[derive(PartialEq, PartialOrd)]
+#[derive(PartialEq, Eq, PartialOrd, Ord)]
 pub enum CardOrder {
     Restaurants = 0,
     SecondaryIndustry = 1,
@@ -68,14 +69,15 @@ fn get_icon_title(icon: CardIcon) -> String {
     }
 }
 
+#[derive(Clone, Copy)]
 pub struct CardStack {
     pub kind: CardKind,
     pub count: u8,
 }
 
 impl CardStack {
-    pub fn test_activation(&self, roll: u8) -> bool {
-        match self.kind {
+    pub fn test_activation(&self, roll: u8, is_current_turn: bool) -> bool {
+        (match self.kind {
             CardKind::WheatField => roll == 1,
             CardKind::Ranch => roll == 2,
             CardKind::Bakery => roll == 2 || roll == 3,
@@ -86,10 +88,14 @@ impl CardStack {
             CardKind::CheeseFactory => roll == 7,
             CardKind::FurnitureFactory => roll == 8,
             CardKind::Mine => roll == 9,
-            CardKind::FamilyRestaurant => roll == 10 || roll == 11,
+            CardKind::FamilyRestaurant => roll == 9 || roll == 10,
             CardKind::AppleOrchard => roll == 10,
             CardKind::FruitAndVegetableMarket => roll == 11 || roll == 12,
-        }
+        } && match self.get_order() {
+            CardOrder::PrimaryIndustry => true,
+            CardOrder::MajorEstabalishments | CardOrder::SecondaryIndustry => is_current_turn,
+            CardOrder::Restaurants => !is_current_turn,
+        })
     }
 
     pub fn get_cost(&self) -> u8 {

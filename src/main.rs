@@ -2,7 +2,7 @@ mod game;
 mod ui;
 
 use crate::game::{
-    controller::{create_deck, roll_dice},
+    controller::{create_deck, get_activatable_cards, roll_dice},
     player::PlayerKind,
 };
 
@@ -29,6 +29,8 @@ fn main() {
         let (first_die, second_die) = roll_dice(number_of_dice == 2);
         let roll_total = first_die + second_die.unwrap_or_default();
         ui::roll_result(first_die, second_die, roll_total);
+
+        let activatable_cards = get_activatable_cards(roll_total, player_turn, &players);
 
         player_turn += 1;
         if player_turn >= player_count {
