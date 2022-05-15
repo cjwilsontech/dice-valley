@@ -1,4 +1,4 @@
-use super::{cards::CardStack, controller::Deck};
+use super::controller::Deck;
 
 #[derive(Clone)]
 pub enum PlayerKind {

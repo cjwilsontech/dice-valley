@@ -1,5 +1,6 @@
 use crate::{
     game::{
+        cards::{CardKind, CardStack},
         controller::create_player_deck,
         player::{Player, PlayerKind},
     },
@@ -56,6 +57,125 @@ pub fn roll_result(first: u8, second: Option<u8>, total: u8) {
     match second {
         Some(second) => println!("Rolled {} and {} for {}", first, second, total),
         None => println!("Rolled {}", first),
+    }
+}
+
+pub fn get_player_to_steal_coins_from(
+    players: &Vec<Player>,
+    player_turn: usize,
+    amount: u8,
+) -> usize {
+    println!(
+        "Which player would you like to steal {} coins from:",
+        amount
+    );
+    get_player_except(players, player_turn)
+}
+
+pub fn get_player_to_trade_establishment_with(
+    players: &Vec<Player>,
+    player_turn: usize,
+) -> (usize, CardKind, CardKind) {
+    loop {
+        println!("Which player would you like to trade a establishment with:");
+        let other_player_number = get_player_except(players, player_turn);
+
+        let other_player = players
+            .get(other_player_number)
+            .expect("Selected player to not be OOB");
+        let other_player_card = get_card_kind(&other_player);
+
+        let current_player = players
+            .get(player_turn)
+            .expect("Selected player to not be OOB");
+        let player_card = get_card_kind(&current_player);
+
+        return (other_player.turn, other_player_card, player_card);
+    }
+}
+
+pub fn share_post_distribution_results(current_coins: u8, before_coins: u8) {
+    let current_coins_i16: i16 = current_coins.into();
+    let before_coins_i16: i16 = before_coins.into();
+    let delta = current_coins_i16 - &before_coins_i16;
+    println!(
+        "Coins: {} ({}{})",
+        current_coins,
+        if delta.is_negative() { "" } else { "+" },
+        delta
+    );
+}
+
+fn get_player_except(players: &Vec<Player>, except_player_turn: usize) -> usize {
+    let player_options: Vec<(usize, String, u8)> = players
+        .iter()
+        .enumerate()
+        .filter_map(|(index, player)| {
+            if player.turn != except_player_turn {
+                println!(
+                    "{}: {} [{} coins, {} cards]",
+                    index,
+                    player.name,
+                    player.coins,
+                    player.cards.map(|card| card.count).iter().sum::<u8>()
+                );
+                Some((player.turn, player.name.clone(), player.coins))
+            } else {
+                None
+            }
+        })
+        .collect();
+
+    loop {
+        return match get_input().trim().parse::<usize>() {
+            Ok(num) => match player_options.get(num) {
+                Some(player) => player.0,
+                None => {
+                    println!("Please specify the player number:");
+                    continue;
+                }
+            },
+            Err(_) => {
+                println!("Please specify the player number:");
+                continue;
+            }
+        };
+    }
+}
+
+fn get_card_kind(player: &Player) -> CardKind {
+    let card_options: Vec<CardStack> = player
+        .cards
+        .into_iter()
+        .filter(|card| card.count > 0)
+        .collect();
+
+    for (index, card_stack) in card_options.iter().enumerate() {
+        println!(
+            "{}: {} (Icon: {}, Cost: {}, Kind: {})",
+            index,
+            card_stack.get_title(),
+            card_stack.get_icon_title(),
+            card_stack.get_cost(),
+            card_stack.get_order_title()
+        );
+    }
+    println!("Which card would you like to choose:");
+
+    loop {
+        return match get_input().trim().parse::<usize>() {
+            Ok(num) => match card_options.get(num) {
+                Some(option) => option.kind,
+                None => {
+                    println!("Please specify the card number:");
+                    continue;
+                }
+            },
+            Err(_) => {
+                println!("Please specify the card number:");
+                continue;
+            }
+        };
     }
 }
 

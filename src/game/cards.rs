@@ -42,9 +42,10 @@ pub enum CardOrder {
     Restaurants = 0,
     SecondaryIndustry = 1,
     PrimaryIndustry = 2,
-    MajorEstabalishments = 3,
+    MajorEstablishments = 3,
 }
 
+#[derive(PartialEq)]
 pub enum CardIcon {
     Wheat,
     Cow,
@@ -54,19 +55,6 @@ pub enum CardIcon {
     Cup,
     Major,
     Fruit,
-}
-
-fn get_icon_title(icon: CardIcon) -> String {
-    match icon {
-        CardIcon::Wheat => String::from("Wheat"),
-        CardIcon::Bread => String::from("Bread"),
-        CardIcon::Cow => String::from("Cow"),
-        CardIcon::Cup => String::from("Cup"),
-        CardIcon::Gear => String::from("Gear"),
-        CardIcon::Major => String::from("Major"),
-        CardIcon::Factory => String::from("Factory"),
-        CardIcon::Fruit => String::from("Fruit"),
-    }
 }
 
 #[derive(Clone, Copy)]
@@ -93,7 +81,7 @@ impl CardStack {
             CardKind::FruitAndVegetableMarket => roll == 11 || roll == 12,
         } && match self.get_order() {
             CardOrder::PrimaryIndustry => true,
-            CardOrder::MajorEstabalishments | CardOrder::SecondaryIndustry => is_current_turn,
+            CardOrder::MajorEstablishments | CardOrder::SecondaryIndustry => is_current_turn,
             CardOrder::Restaurants => !is_current_turn,
         })
     }
@@ -127,8 +115,17 @@ impl CardStack {
             | CardKind::FruitAndVegetableMarket => CardOrder::SecondaryIndustry,
             CardKind::Cafe | CardKind::FamilyRestaurant => CardOrder::Restaurants,
             CardKind::Stadium | CardKind::TvStation | CardKind::BusinessCenter => {
-                CardOrder::MajorEstabalishments
+                CardOrder::MajorEstablishments
             }
+        }
+    }
+
+    pub fn get_order_title(&self) -> &'static str {
+        match self.get_order() {
+            CardOrder::MajorEstablishments => "Major Establishments",
+            CardOrder::PrimaryIndustry => "Primary Industry",
+            CardOrder::Restaurants => "Restaurants",
+            CardOrder::SecondaryIndustry => "Secondary Industry",
         }
     }
 
@@ -145,27 +142,36 @@ impl CardStack {
         }
     }
 
-    pub fn get_icon_title(&self) -> String {
-        get_icon_title(self.get_icon())
+    pub fn get_icon_title(&self) -> &'static str {
+        match self.get_icon() {
+            CardIcon::Wheat => "Wheat",
+            CardIcon::Bread => "Bread",
+            CardIcon::Cow => "Cow",
+            CardIcon::Cup => "Cup",
+            CardIcon::Gear => "Gear",
+            CardIcon::Major => "Major",
+            CardIcon::Factory => "Factory",
+            CardIcon::Fruit => "Fruit",
+        }
     }
 
-    pub fn get_title(&self) -> String {
+    pub fn get_title(&self) -> &'static str {
         match self.kind {
-            CardKind::WheatField => String::from("Wheat Field"),
-            CardKind::Ranch => String::from("Ranch"),
-            CardKind::Bakery => String::from("Bakery"),
-            CardKind::Cafe => String::from("Cafe"),
-            CardKind::ConvenienceStore => String::from("Convenience Store"),
-            CardKind::Forest => String::from("Forest"),
-            CardKind::Stadium => String::from("Stadium"),
-            CardKind::TvStation => String::from("TV Station"),
-            CardKind::BusinessCenter => String::from("Business Center"),
-            CardKind::CheeseFactory => String::from("Cheese Factory"),
-            CardKind::FurnitureFactory => String::from("Furniture Factory"),
-            CardKind::Mine => String::from("Mine"),
-            CardKind::FamilyRestaurant => String::from("Family Restaurant"),
-            CardKind::AppleOrchard => String::from("Apple Orchard"),
-            CardKind::FruitAndVegetableMarket => String::from("Fruit and Vegetable Market"),
+            CardKind::WheatField => "Wheat Field",
+            CardKind::Ranch => "Ranch",
+            CardKind::Bakery => "Bakery",
+            CardKind::Cafe => "Cafe",
+            CardKind::ConvenienceStore => "Convenience Store",
+            CardKind::Forest => "Forest",
+            CardKind::Stadium => "Stadium",
+            CardKind::TvStation => "TV Station",
+            CardKind::BusinessCenter => "Business Center",
+            CardKind::CheeseFactory => "Cheese Factory",
+            CardKind::FurnitureFactory => "Furniture Factory",
+            CardKind::Mine => "Mine",
+            CardKind::FamilyRestaurant => "Family Restaurant",
+            CardKind::AppleOrchard => "Apple Orchard",
+            CardKind::FruitAndVegetableMarket => "Fruit and Vegetable Market",
         }
     }
 }
