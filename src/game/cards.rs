@@ -20,21 +20,21 @@ pub enum CardKind {
 }
 
 pub const ALL_CARDS: [CardKind; CARD_KIND_COUNT] = [
-    CardKind::AppleOrchard,
-    CardKind::Bakery,
-    CardKind::BusinessCenter,
-    CardKind::Cafe,
-    CardKind::CheeseFactory,
-    CardKind::ConvenienceStore,
-    CardKind::FamilyRestaurant,
-    CardKind::Forest,
-    CardKind::FruitAndVegetableMarket,
-    CardKind::FurnitureFactory,
-    CardKind::Mine,
+    CardKind::WheatField,
     CardKind::Ranch,
+    CardKind::Bakery,
+    CardKind::Cafe,
+    CardKind::ConvenienceStore,
+    CardKind::Forest,
     CardKind::Stadium,
     CardKind::TvStation,
-    CardKind::WheatField,
+    CardKind::BusinessCenter,
+    CardKind::CheeseFactory,
+    CardKind::FurnitureFactory,
+    CardKind::Mine,
+    CardKind::FamilyRestaurant,
+    CardKind::AppleOrchard,
+    CardKind::FruitAndVegetableMarket,
 ];
 
 #[derive(PartialEq, Eq, PartialOrd, Ord)]
