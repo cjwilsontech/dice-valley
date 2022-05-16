@@ -35,51 +35,49 @@ fn main() {
         let activatable_cards = get_activatable_cards(roll_total, player_turn, &players);
 
         let before_coins = current_player.coins;
-        for player_card in activatable_cards {
-            for _ in 0..player_card.card.count {
-                match player_card.card.kind {
-                    CardKind::AppleOrchard => award_coins(&mut players, player_turn, 3),
-                    CardKind::Bakery => award_coins(&mut players, player_turn, 1),
+        for card in activatable_cards {
+            for _ in 0..card.card.count {
+                match card.card.kind {
+                    CardKind::AppleOrchard => award_coins(&mut players, card.owner_turn, 3),
+                    CardKind::Bakery => award_coins(&mut players, card.owner_turn, 1),
                     CardKind::BusinessCenter => {
                         let (other_player, other_player_card_kind, player_card_kind) =
-                            ui::get_player_to_trade_establishment_with(&players, player_turn);
+                            ui::get_player_to_trade_establishment_with(&players, card.owner_turn);
                         trade_establishments(
                             &mut players,
-                            player_turn,
+                            card.owner_turn,
                             other_player,
                             player_card_kind,
                             other_player_card_kind,
                         );
                         0
                     }
-                    CardKind::Cafe => {
-                        steal_coins(&mut players, player_turn, player_card.player_turn, 1)
-                    }
+                    CardKind::Cafe => steal_coins(&mut players, player_turn, card.owner_turn, 1),
                     CardKind::CheeseFactory => {
-                        award_coins_combo(&mut players, player_turn, CardIcon::Cow, 3)
+                        award_coins_combo(&mut players, card.owner_turn, CardIcon::Cow, 3)
                     }
-                    CardKind::ConvenienceStore => award_coins(&mut players, player_turn, 3),
+                    CardKind::ConvenienceStore => award_coins(&mut players, card.owner_turn, 3),
                     CardKind::FamilyRestaurant => {
-                        steal_coins(&mut players, player_turn, player_card.player_turn, 2)
+                        steal_coins(&mut players, player_turn, card.owner_turn, 2)
                     }
-                    CardKind::Forest => award_coins(&mut players, player_turn, 1),
+                    CardKind::Forest => award_coins(&mut players, card.owner_turn, 1),
                     CardKind::FruitAndVegetableMarket => {
-                        award_coins_combo(&mut players, player_turn, CardIcon::Wheat, 2)
+                        award_coins_combo(&mut players, card.owner_turn, CardIcon::Wheat, 2)
                     }
                     CardKind::FurnitureFactory => {
-                        award_coins_combo(&mut players, player_turn, CardIcon::Gear, 3)
+                        award_coins_combo(&mut players, card.owner_turn, CardIcon::Gear, 3)
                     }
-                    CardKind::Mine => award_coins(&mut players, player_turn, 5),
-                    CardKind::Ranch => award_coins(&mut players, player_turn, 1),
+                    CardKind::Mine => award_coins(&mut players, card.owner_turn, 5),
+                    CardKind::Ranch => award_coins(&mut players, card.owner_turn, 1),
                     CardKind::Stadium => {
-                        steal_coins_from_all(&mut players, player_turn, player_count, 2)
+                        steal_coins_from_all(&mut players, card.owner_turn, player_count, 2)
                     }
                     CardKind::TvStation => {
                         let from_player =
-                            ui::get_player_to_steal_coins_from(&players, player_turn, 5);
-                        steal_coins(&mut players, from_player, player_turn, 5)
+                            ui::get_player_to_steal_coins_from(&players, card.owner_turn, 5);
+                        steal_coins(&mut players, from_player, card.owner_turn, 5)
                     }
-                    CardKind::WheatField => award_coins(&mut players, player_turn, 1),
+                    CardKind::WheatField => award_coins(&mut players, card.owner_turn, 1),
                 };
             }
         }

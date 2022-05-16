@@ -9,7 +9,7 @@ pub type Deck = [CardStack; CARD_KIND_COUNT];
 
 // A CardStack owned by the specified player.
 pub struct PlayerCardStack {
-    pub player_turn: usize,
+    pub owner_turn: usize,
     pub card: CardStack,
 }
 
@@ -161,7 +161,7 @@ pub fn get_activatable_cards(
                     card.count > 0 && card.test_activation(roll_total, player.turn == player_turn)
                 })
                 .map(|cards| PlayerCardStack {
-                    player_turn: player.turn,
+                    owner_turn: player.turn,
                     card: cards,
                 })
                 .collect::<Vec<PlayerCardStack>>()
@@ -226,10 +226,10 @@ mod tests {
         let card_activations = get_activatable_cards(9, 0, &get_players());
         assert_eq!(card_activations[0].card.kind, CardKind::FamilyRestaurant);
         assert_eq!(card_activations[0].card.count, 1);
-        assert_eq!(card_activations[0].player_turn, 1);
+        assert_eq!(card_activations[0].owner_turn, 1);
         assert_eq!(card_activations[1].card.kind, CardKind::Mine);
         assert_eq!(card_activations[1].card.count, 2);
-        assert_eq!(card_activations[1].player_turn, 0);
+        assert_eq!(card_activations[1].owner_turn, 0);
     }
 
     #[test]
@@ -237,10 +237,10 @@ mod tests {
         let card_activations = get_activatable_cards(3, 0, &get_players());
         assert_eq!(card_activations[0].card.kind, CardKind::Cafe);
         assert_eq!(card_activations[0].card.count, 1);
-        assert_eq!(card_activations[0].player_turn, 1);
+        assert_eq!(card_activations[0].owner_turn, 1);
         assert_eq!(card_activations[1].card.kind, CardKind::Bakery);
         assert_eq!(card_activations[1].card.count, 1);
-        assert_eq!(card_activations[1].player_turn, 0);
+        assert_eq!(card_activations[1].owner_turn, 0);
     }
 
     #[test]
