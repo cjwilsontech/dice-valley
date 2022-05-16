@@ -169,6 +169,7 @@ pub fn buy_a_card(
                             continue;
                         }
 
+                        println!("Bought the {}.", card.get_title());
                         Some((Some(card.kind), None))
                     } else if selected_index - CARD_KIND_COUNT < LANDMARK_KIND_COUNT {
                         let landmark_index = selected_index - CARD_KIND_COUNT;
@@ -185,6 +186,8 @@ pub fn buy_a_card(
                         );
                             continue;
                         }
+
+                        println!("Bought the {} landmark.", get_landmark_title(landmark));
                         Some((None, Some(landmark.clone())))
                     } else {
                         println!("Invalid option, please select a number from the list:");
