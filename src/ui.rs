@@ -108,6 +108,10 @@ pub fn share_post_distribution_results(current_coins: u8, before_coins: u8) {
 }
 
 pub fn buy_a_card(card_deck: &Deck, coins: u8) -> Option<CardKind> {
+    if coins == 0 {
+        return None;
+    }
+
     println!();
     println!("Available cards");
     for (index, card) in card_deck.iter().enumerate() {
