@@ -1,7 +1,7 @@
 use crate::{
     game::{
         cards::{CardKind, CardStack},
-        controller::create_player_deck,
+        controller::{create_player_deck, Deck},
         player::{Player, PlayerKind},
     },
     MAX_PLAYER_COUNT,
@@ -104,6 +104,57 @@ pub fn share_post_distribution_results(current_coins: u8, before_coins: u8) {
         if delta.is_negative() { "" } else { "+" },
         delta
     );
+}
+
+pub fn buy_a_card(card_deck: &Deck, coins: u8) -> Option<CardKind> {
+    println!("");
+    println!("Available cards");
+    for (index, card) in card_deck.iter().enumerate() {
+        println!(
+            "{}: {} C: {}, I: {}, O: {}, D: {}",
+            index,
+            card.get_title(),
+            card.get_cost(),
+            card.get_icon_title(),
+            card.get_order_title(),
+            "Description coming soon!"
+        );
+    }
+    println!("Would you like to buy a card? (#, n):");
+
+    loop {
+        break match get_input().trim().to_lowercase().as_str() {
+            "n" => None,
+            input => match input.parse::<usize>() {
+                Ok(index) => {
+                    let card = card_deck.get(index).expect("Index to be in bounds.");
+                    if card.count == 0 {
+                        println!(
+                            "Sorry, there are no {} left. Please select another option:",
+                            card.get_title()
+                        );
+                        continue;
+                    }
+
+                    let cost = card.get_cost();
+                    if coins < cost {
+                        println!(
+                            "Sorry, you only have {} coins but need {}. Please select another option:",
+                            coins,
+                            cost
+                        );
+                        continue;
+                    }
+
+                    Some(card.kind)
+                }
+                Err(_) => {
+                    println!("Please specifiy either a number or \"n\" to skip.");
+                    continue;
+                }
+            },
+        };
+    }
 }
 
 fn get_player_except(players: &Vec<Player>, except_player_turn: usize) -> usize {

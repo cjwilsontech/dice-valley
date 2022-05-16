@@ -96,6 +96,21 @@ pub fn trade_establishments(
     add_player_card(players, other_player_turn, player_card_kind, 1);
 }
 
+pub fn buy_card_from_deck(
+    players: &mut Vec<Player>,
+    player_turn: usize,
+    card_deck: &mut Deck,
+    card_kind: CardKind,
+) {
+    let card = card_deck
+        .iter_mut()
+        .find(|card| card.kind == card_kind)
+        .expect("Expect to find card entry in deck.");
+    remove_card_from_stack(card, 1);
+    take_coins(players, player_turn, card.get_cost());
+    add_player_card(players, player_turn, card_kind, 1);
+}
+
 pub fn add_player_card(
     players: &mut Vec<Player>,
     player_turn: usize,
@@ -119,16 +134,16 @@ pub fn remove_player_card(
     card_kind: CardKind,
     amount: u8,
 ) {
-    let player_mut = players
-        .get_mut(player_turn)
-        .expect("Player to be in bounds.");
-    let mut player_card = player_mut
-        .cards
-        .iter_mut()
-        .find(|card| card.kind == card_kind)
-        .expect("To find the card kind.");
-    player_card.count =
-        u8::checked_sub(player_card.count, amount).expect("To have a card count > 0.");
+    remove_card_from_stack(
+        players
+            .get_mut(player_turn)
+            .expect("Player to be in bounds.")
+            .cards
+            .iter_mut()
+            .find(|card| card.kind == card_kind)
+            .expect("To find the card kind."),
+        amount,
+    );
 }
 
 pub fn get_activatable_cards(
@@ -190,6 +205,10 @@ pub fn roll_dice(roll_two_dice: bool) -> DiceRoll {
     )
 }
 
+fn remove_card_from_stack(card: &mut CardStack, amount: u8) {
+    card.count = u8::checked_sub(card.count, amount).expect("To not remove more cards than exist.");
+}
+
 #[cfg(test)]
 mod tests {
     use crate::game::{
@@ -198,8 +217,8 @@ mod tests {
     };
 
     use super::{
-        award_coins_combo, get_activatable_cards, steal_coins, steal_coins_from_all,
-        trade_establishments,
+        award_coins_combo, buy_card_from_deck, create_deck, get_activatable_cards, steal_coins,
+        steal_coins_from_all, trade_establishments,
     };
 
     #[test]
@@ -293,6 +312,28 @@ mod tests {
         assert_eq!(players[2].cards[1].count, 0);
         assert_eq!(players[1].cards[6].count, 0);
         assert_eq!(players[1].cards[1].count, 2);
+    }
+
+    #[test]
+    fn test_buy_card_from_deck() {
+        let mut players = get_players();
+        let mut card_deck = create_deck();
+        buy_card_from_deck(&mut players, 2, &mut card_deck, CardKind::AppleOrchard);
+        assert_eq!(players[2].cards[0].count, 1);
+        assert_eq!(players[2].cards[0].kind, CardKind::AppleOrchard);
+        assert_eq!(players[2].coins, 0);
+        assert_eq!(card_deck[0].count, 5);
+    }
+
+    #[test]
+    fn test_buy_another_card_from_deck() {
+        let mut players = get_players();
+        let mut card_deck = create_deck();
+        buy_card_from_deck(&mut players, 2, &mut card_deck, CardKind::WheatField);
+        assert_eq!(players[2].cards[14].count, 4);
+        assert_eq!(players[2].cards[14].kind, CardKind::WheatField);
+        assert_eq!(players[2].coins, 2);
+        assert_eq!(card_deck[14].count, 5);
     }
 
     fn get_players() -> Vec<Player> {

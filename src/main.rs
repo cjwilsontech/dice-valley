@@ -4,8 +4,8 @@ mod ui;
 use crate::game::{
     cards::{CardIcon, CardKind},
     controller::{
-        award_coins, award_coins_combo, create_deck, get_activatable_cards, roll_dice, steal_coins,
-        steal_coins_from_all, trade_establishments,
+        award_coins, award_coins_combo, buy_card_from_deck, create_deck, get_activatable_cards,
+        roll_dice, steal_coins, steal_coins_from_all, trade_establishments,
     },
     player::PlayerKind,
 };
@@ -16,7 +16,7 @@ fn main() {
     println!("Dice Valley");
 
     let (mut players, player_count) = ui::get_players();
-    let card_deck = create_deck();
+    let mut card_deck = create_deck();
 
     let mut player_turn: usize = 0;
     loop {
@@ -86,6 +86,16 @@ fn main() {
 
         let current_player = players.get(player_turn).expect("Player to not be OOB.");
         ui::share_post_distribution_results(current_player.coins, before_coins);
+
+        let purchase_decision = ui::buy_a_card(&card_deck, current_player.coins);
+        if purchase_decision.is_some() {
+            buy_card_from_deck(
+                &mut players,
+                player_turn,
+                &mut card_deck,
+                purchase_decision.unwrap(),
+            );
+        }
 
         player_turn += 1;
         if player_turn >= player_count {
