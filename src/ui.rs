@@ -130,7 +130,7 @@ pub fn buy_a_card(
             None => 0,
         };
         println!(
-            "{}: {} [have {}, {} left] Cost: {}, Class: {}, Icon: {}, Description: {}",
+            "{}: {} [have {}, {} left] Cost: {}, Class: {}, Icon: {}, {}",
             index,
             card.get_title(),
             player_card_count,
@@ -138,7 +138,7 @@ pub fn buy_a_card(
             card.get_cost(),
             card.get_order_title(),
             card.get_icon_title(),
-            "Description coming soon!"
+            card.get_description()
         );
         index += 1;
     }

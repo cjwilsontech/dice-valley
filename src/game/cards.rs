@@ -174,4 +174,26 @@ impl CardStack {
             CardKind::FruitAndVegetableMarket => "Fruit and Vegetable Market",
         }
     }
+
+    pub fn get_description(&self) -> &'static str {
+        match self.kind {
+            CardKind::WheatField | CardKind::Ranch | CardKind::Forest => {
+                "Get 1 coin from the bank, on anyone's turn."
+            }
+            CardKind::Bakery => "Get 1 coin from the bank, on your turn only.",
+            CardKind::Cafe => "Get 1 coin from the player who rolled the dice.",
+            CardKind::ConvenienceStore => "Get 3 coins from the bank, on your turn only.",
+            CardKind::Stadium => "Get 2 coins from all players, on your turn only.",
+            CardKind::TvStation => "If this is your turn, take 5 coins from any one player.",
+            CardKind::BusinessCenter => {
+                "If this is your turn, trade one non-Major establishment with another player."
+            }
+            CardKind::CheeseFactory => "If this is your turn, get 3 coins from the bank for each Cow establishment that you own.",
+            CardKind::FurnitureFactory => "If this is your turn, get 3 coins from the bank for each Gear establishment that you own.",
+            CardKind::Mine => "Get 5 coins from the bank, on anyone's turn.",
+            CardKind::FamilyRestaurant => "Get 2 coins from the player who rolled the dice.",
+            CardKind::AppleOrchard => "Get 3 coins from the bank, on anyone's turn.",
+            CardKind::FruitAndVegetableMarket => "If this is your turn, get 2 coins from the bank for each Wheat establishment that you own.",
+        }
+    }
 }
