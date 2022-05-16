@@ -232,6 +232,15 @@ pub fn amusement_park_turn() {
     println!("You rolled doubles and have the Amusement Park, take another turn!");
 }
 
+pub fn player_has_won(player: &Player) {
+    println!();
+    print!(
+        "{} ({}) has won the game! Congratulations!",
+        player.name,
+        player.get_kind_name()
+    );
+}
+
 fn print_landmark_information(index: usize, landmark: &LandmarkKind) {
     println!(
         "{}: {} [Landmark] Cost: {}, {}",

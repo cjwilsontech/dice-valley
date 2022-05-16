@@ -5,7 +5,8 @@ use crate::game::{
     cards::{CardIcon, CardKind},
     controller::{
         award_coins, award_coins_combo, buy_card_from_deck, buy_landmark, create_deck,
-        get_activatable_cards, roll_dice, steal_coins, steal_coins_from_all, trade_establishments,
+        get_activatable_cards, has_player_won, roll_dice, steal_coins, steal_coins_from_all,
+        trade_establishments,
     },
     landmarks::LandmarkKind,
     player::PlayerKind,
@@ -146,6 +147,11 @@ fn main() {
         {
             ui::amusement_park_turn();
             continue;
+        }
+
+        if has_player_won(player) {
+            ui::player_has_won(player);
+            break;
         }
 
         current_turn += 1;

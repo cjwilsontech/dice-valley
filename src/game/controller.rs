@@ -3,7 +3,7 @@ use std::cmp::Ordering;
 
 use super::{
     cards::{CardIcon, CardKind, CardStack, ALL_CARDS, CARD_KIND_COUNT},
-    landmarks::{get_landmark_cost, LandmarkKind},
+    landmarks::{get_landmark_cost, LandmarkKind, ALL_LANDMARKS},
     player::Player,
 };
 
@@ -223,6 +223,12 @@ pub fn roll_dice(roll_two_dice: bool) -> DiceRoll {
             None
         },
     )
+}
+
+pub fn has_player_won(player: &Player) -> bool {
+    ALL_LANDMARKS
+        .iter()
+        .all(|landmark| player.landmarks.contains(landmark))
 }
 
 fn remove_card_from_stack(card: &mut CardStack, amount: u8) {
