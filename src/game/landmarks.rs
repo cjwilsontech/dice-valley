@@ -32,3 +32,12 @@ pub fn get_landmark_title(landmark: &LandmarkKind) -> &'static str {
         LandmarkKind::RadioTower => "Radio Tower",
     }
 }
+
+pub fn get_landmark_description(landmark: &LandmarkKind) -> &'static str {
+    match landmark {
+        LandmarkKind::TrainStation => "You may roll 1 or 2 dice.",
+        LandmarkKind::ShoppingMall => "Each of your Cup and Bread establishments earn +1 coin.",
+        LandmarkKind::AmusementPark => "If you roll doubles, take another turn after this one.",
+        LandmarkKind::RadioTower => "Once every turn, you can choose to re-roll your dice.",
+    }
+}

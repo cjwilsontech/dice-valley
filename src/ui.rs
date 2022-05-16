@@ -3,7 +3,8 @@ use crate::{
         cards::{CardKind, CardStack, CARD_KIND_COUNT},
         controller::{create_player_deck, Deck, PlayerCardStack},
         landmarks::{
-            get_landmark_cost, get_landmark_title, LandmarkKind, ALL_LANDMARKS, LANDMARK_KIND_COUNT,
+            get_landmark_cost, get_landmark_description, get_landmark_title, LandmarkKind,
+            ALL_LANDMARKS, LANDMARK_KIND_COUNT,
         },
         player::{Player, PlayerKind},
     },
@@ -247,11 +248,11 @@ pub fn amusement_park_turn() {
 
 fn print_landmark_information(index: usize, landmark: &LandmarkKind) {
     println!(
-        "{}: {} [Landmark] Cost: {}, Description: {}",
+        "{}: {} [Landmark] Cost: {}, {}",
         index,
         get_landmark_title(landmark),
         get_landmark_cost(landmark),
-        "Description coming soon!"
+        get_landmark_description(landmark)
     );
 }
 
