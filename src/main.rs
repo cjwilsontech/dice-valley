@@ -18,12 +18,12 @@ fn main() {
     let (mut players, player_count) = ui::get_players();
     let mut card_deck = create_deck();
 
-    let mut player_turn: usize = 0;
+    let mut current_turn: usize = 0;
     loop {
-        let current_player = players.get(player_turn).expect("Player to not be OOB.");
-        ui::start_player_turn(&current_player);
+        let player = players.get(current_turn).expect("Player to not be OOB.");
+        ui::start_player_turn(&player);
 
-        let number_of_dice = match current_player.kind {
+        let number_of_dice = match player.kind {
             PlayerKind::Human => ui::get_number_of_dice(true),
             PlayerKind::Computer => 1,
         };
@@ -32,9 +32,9 @@ fn main() {
         let roll_total = first_die + second_die.unwrap_or_default();
         ui::roll_result(first_die, second_die, roll_total);
 
-        let activatable_cards = get_activatable_cards(roll_total, player_turn, &players);
+        let activatable_cards = get_activatable_cards(roll_total, current_turn, &players);
 
-        let before_coins = current_player.coins;
+        let before_coins = player.coins;
         for card in activatable_cards {
             for _ in 0..card.card.count {
                 match card.card.kind {
@@ -52,13 +52,13 @@ fn main() {
                         );
                         0
                     }
-                    CardKind::Cafe => steal_coins(&mut players, player_turn, card.owner_turn, 1),
+                    CardKind::Cafe => steal_coins(&mut players, current_turn, card.owner_turn, 1),
                     CardKind::CheeseFactory => {
                         award_coins_combo(&mut players, card.owner_turn, CardIcon::Cow, 3)
                     }
                     CardKind::ConvenienceStore => award_coins(&mut players, card.owner_turn, 3),
                     CardKind::FamilyRestaurant => {
-                        steal_coins(&mut players, player_turn, card.owner_turn, 2)
+                        steal_coins(&mut players, current_turn, card.owner_turn, 2)
                     }
                     CardKind::Forest => award_coins(&mut players, card.owner_turn, 1),
                     CardKind::FruitAndVegetableMarket => {
@@ -82,22 +82,22 @@ fn main() {
             }
         }
 
-        let current_player = players.get(player_turn).expect("Player to not be OOB.");
-        ui::share_post_distribution_results(current_player.coins, before_coins);
+        let player = players.get(current_turn).expect("Player to not be OOB.");
+        ui::share_post_distribution_results(player.coins, before_coins);
 
-        let purchase_decision = ui::buy_a_card(&card_deck, current_player.coins);
+        let purchase_decision = ui::buy_a_card(&card_deck, player.coins);
         if purchase_decision.is_some() {
             buy_card_from_deck(
                 &mut players,
-                player_turn,
+                current_turn,
                 &mut card_deck,
                 purchase_decision.unwrap(),
             );
         }
 
-        player_turn += 1;
-        if player_turn >= player_count {
-            player_turn = 0;
+        current_turn += 1;
+        if current_turn >= player_count {
+            current_turn = 0;
         }
     }
 }
