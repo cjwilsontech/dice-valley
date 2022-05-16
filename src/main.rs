@@ -124,6 +124,7 @@ fn main() {
         ui::share_post_distribution_results(player.coins, before_coins);
 
         let purchase_decision = player.buy_a_card(&card_deck);
+        ui::show_purchase_decision(&purchase_decision);
         if purchase_decision.is_some() {
             let (card_purchase, landmark_purchase) = purchase_decision.unwrap();
             match card_purchase {

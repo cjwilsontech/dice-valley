@@ -1,6 +1,6 @@
 use crate::{
     game::{
-        cards::{CardIcon, CardKind, CardStack, CARD_KIND_COUNT},
+        cards::{get_card_title, CardIcon, CardKind, CardStack, CARD_KIND_COUNT},
         controller::{create_player_deck, Deck, PlayerCardStack},
         landmarks::{
             get_landmark_cost, get_landmark_description, get_landmark_title, LandmarkKind,
@@ -169,7 +169,6 @@ pub fn buy_a_card(
                             continue;
                         }
 
-                        println!("Bought the {}.", card.get_title());
                         Some((Some(card.kind), None))
                     } else if selected_index - CARD_KIND_COUNT < LANDMARK_KIND_COUNT {
                         let landmark_index = selected_index - CARD_KIND_COUNT;
@@ -187,7 +186,6 @@ pub fn buy_a_card(
                             continue;
                         }
 
-                        println!("Bought the {} landmark.", get_landmark_title(landmark));
                         Some((None, Some(landmark.clone())))
                     } else {
                         println!("Invalid option, please select a number from the list:");
@@ -200,6 +198,25 @@ pub fn buy_a_card(
                 }
             },
         };
+    }
+}
+
+pub fn show_purchase_decision(
+    purchase_decision: &Option<(Option<CardKind>, Option<LandmarkKind>)>,
+) {
+    match purchase_decision {
+        Some((card_kind, landmark_kind)) => match card_kind {
+            Some(card) => println!("Bought the {}.", get_card_title(card.clone())),
+            None => println!(
+                "Bought the {} landmark.",
+                get_landmark_title(
+                    &landmark_kind
+                        .clone()
+                        .expect("Expected either a card or a landmark.")
+                )
+            ),
+        },
+        None => println!("Didn't buy anything."),
     }
 }
 

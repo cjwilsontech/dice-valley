@@ -63,6 +63,26 @@ pub struct CardStack {
     pub count: u8,
 }
 
+pub fn get_card_title(card_kind: CardKind) -> &'static str {
+    match card_kind {
+        CardKind::WheatField => "Wheat Field",
+        CardKind::Ranch => "Ranch",
+        CardKind::Bakery => "Bakery",
+        CardKind::Cafe => "Cafe",
+        CardKind::ConvenienceStore => "Convenience Store",
+        CardKind::Forest => "Forest",
+        CardKind::Stadium => "Stadium",
+        CardKind::TvStation => "TV Station",
+        CardKind::BusinessCenter => "Business Center",
+        CardKind::CheeseFactory => "Cheese Factory",
+        CardKind::FurnitureFactory => "Furniture Factory",
+        CardKind::Mine => "Mine",
+        CardKind::FamilyRestaurant => "Family Restaurant",
+        CardKind::AppleOrchard => "Apple Orchard",
+        CardKind::FruitAndVegetableMarket => "Fruit and Vegetable Market",
+    }
+}
+
 pub fn get_card_icon(card_kind: CardKind) -> CardIcon {
     match card_kind {
         CardKind::AppleOrchard | CardKind::WheatField => CardIcon::Wheat,
@@ -160,23 +180,7 @@ impl CardStack {
     }
 
     pub fn get_title(&self) -> &'static str {
-        match self.kind {
-            CardKind::WheatField => "Wheat Field",
-            CardKind::Ranch => "Ranch",
-            CardKind::Bakery => "Bakery",
-            CardKind::Cafe => "Cafe",
-            CardKind::ConvenienceStore => "Convenience Store",
-            CardKind::Forest => "Forest",
-            CardKind::Stadium => "Stadium",
-            CardKind::TvStation => "TV Station",
-            CardKind::BusinessCenter => "Business Center",
-            CardKind::CheeseFactory => "Cheese Factory",
-            CardKind::FurnitureFactory => "Furniture Factory",
-            CardKind::Mine => "Mine",
-            CardKind::FamilyRestaurant => "Family Restaurant",
-            CardKind::AppleOrchard => "Apple Orchard",
-            CardKind::FruitAndVegetableMarket => "Fruit and Vegetable Market",
-        }
+        get_card_title(self.kind)
     }
 
     pub fn get_description(&self) -> &'static str {

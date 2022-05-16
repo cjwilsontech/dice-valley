@@ -36,7 +36,7 @@ pub fn get_trade_establishments(
         .cards
         .iter()
         .filter_map(|card| {
-            if get_card_icon(&card.kind) != CardIcon::Major && card.count > 0 {
+            if get_card_icon(card.kind) != CardIcon::Major && card.count > 0 {
                 Some(card.kind)
             } else {
                 None
@@ -51,7 +51,7 @@ pub fn get_trade_establishments(
         .cards
         .iter()
         .filter_map(|card| {
-            if get_card_icon(&card.kind) != CardIcon::Major && card.count > 0 {
+            if get_card_icon(card.kind) != CardIcon::Major && card.count > 0 {
                 Some(card.kind)
             } else {
                 None
