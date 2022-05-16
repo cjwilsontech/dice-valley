@@ -1,7 +1,10 @@
 use crate::{
     game::{
-        cards::{CardKind, CardStack},
+        cards::{CardKind, CardStack, CARD_KIND_COUNT},
         controller::{create_player_deck, Deck, PlayerCardStack},
+        landmarks::{
+            get_landmark_cost, get_landmark_title, LandmarkKind, ALL_LANDMARKS, LANDMARK_KIND_COUNT,
+        },
         player::{Player, PlayerKind},
     },
     MAX_PLAYER_COUNT,
@@ -20,6 +23,7 @@ pub fn get_players() -> (Vec<Player>, usize) {
             kind: get_player_kind(),
             cards: create_player_deck(),
             coins: 0,
+            landmarks: Vec::new(),
         });
     }
     (players, player_count)
@@ -107,14 +111,20 @@ pub fn share_post_distribution_results(current_coins: u8, before_coins: u8) {
     );
 }
 
-pub fn buy_a_card(card_deck: &Deck, player: &Player) -> Option<CardKind> {
+pub fn buy_a_card(
+    card_deck: &Deck,
+    player: &Player,
+) -> Option<(Option<CardKind>, Option<LandmarkKind>)> {
     if player.coins == 0 {
         return None;
     }
 
     println!();
     println!("Available cards");
-    for (index, card) in card_deck.iter().enumerate() {
+
+    // Print regular cards.
+    let mut index: usize = 0;
+    for card in card_deck.iter() {
         let player_card_count: u8 = match player.cards.iter().find(|c| c.kind == card.kind) {
             Some(c) => c.count,
             None => 0,
@@ -130,34 +140,69 @@ pub fn buy_a_card(card_deck: &Deck, player: &Player) -> Option<CardKind> {
             card.get_icon_title(),
             "Description coming soon!"
         );
+        index += 1;
     }
+
+    // Print unbuilt landmarks.
+    let available_landmarks: Vec<LandmarkKind> = ALL_LANDMARKS
+        .into_iter()
+        .filter(|kind| !player.landmarks.contains(&kind))
+        .collect();
+    for landmark in &available_landmarks {
+        print_landmark_information(index, &landmark);
+        index += 1;
+    }
+
     println!("Would you like to buy a card? (#, n):");
 
     loop {
         break match get_input().trim().to_lowercase().as_str() {
             "n" => None,
             input => match input.parse::<usize>() {
-                Ok(index) => {
-                    let card = card_deck.get(index).expect("Index to be in bounds.");
-                    if card.count == 0 {
-                        println!(
-                            "Sorry, there are no {} left. Please select another option:",
-                            card.get_title()
-                        );
-                        continue;
-                    }
+                Ok(selected_index) => {
+                    if selected_index < CARD_KIND_COUNT {
+                        let card = card_deck
+                            .get(selected_index)
+                            .expect("Card index to be in bounds.");
+                        if card.count == 0 {
+                            println!(
+                                "Sorry, there are no {} left. Please select another option:",
+                                card.get_title()
+                            );
+                            continue;
+                        }
 
-                    let cost = card.get_cost();
-                    if player.coins < cost {
-                        println!(
+                        let cost = card.get_cost();
+                        if player.coins < cost {
+                            println!(
                             "Sorry, you only have {} coins but need {}. Please select another option:",
                             player.coins,
                             cost
                         );
+                            continue;
+                        }
+
+                        Some((Some(card.kind), None))
+                    } else if selected_index - CARD_KIND_COUNT < LANDMARK_KIND_COUNT {
+                        let landmark_index = selected_index - CARD_KIND_COUNT;
+                        let landmark = available_landmarks
+                            .get(landmark_index)
+                            .expect("Landmark index to be in bounds.");
+
+                        let cost = get_landmark_cost(&landmark);
+                        if player.coins < cost {
+                            println!(
+                            "Sorry, you only have {} coins but need {}. Please select another option:",
+                            player.coins,
+                            cost
+                        );
+                            continue;
+                        }
+                        Some((None, Some(landmark.clone())))
+                    } else {
+                        println!("Invalid option, please select a number from the list:");
                         continue;
                     }
-
-                    Some(card.kind)
                 }
                 Err(_) => {
                     println!("Please specifiy either a number or \"n\" to skip.");
@@ -182,6 +227,32 @@ pub fn show_activated_cards(cards: &Vec<PlayerCardStack>) {
         }
         println!();
     }
+}
+
+pub fn ask_reroll() -> bool {
+    loop {
+        println!("Would you like to re-roll? (y, n):");
+        return match get_input().trim().to_lowercase().as_str() {
+            "y" => true,
+            "n" => false,
+            _ => continue,
+        };
+    }
+}
+
+pub fn amusement_park_turn() {
+    println!();
+    println!("You rolled doubles and have the Amusement Park, take another turn!");
+}
+
+fn print_landmark_information(index: usize, landmark: &LandmarkKind) {
+    println!(
+        "{}: {} [Landmark] Cost: {}, Description: {}",
+        index,
+        get_landmark_title(landmark),
+        get_landmark_cost(landmark),
+        "Description coming soon!"
+    );
 }
 
 fn get_player_except(players: &Vec<Player>, except_player_turn: usize) -> usize {

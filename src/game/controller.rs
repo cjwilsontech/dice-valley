@@ -3,6 +3,7 @@ use std::cmp::Ordering;
 
 use super::{
     cards::{CardIcon, CardKind, CardStack, ALL_CARDS, CARD_KIND_COUNT},
+    landmarks::{get_landmark_cost, LandmarkKind},
     player::Player,
 };
 
@@ -55,7 +56,7 @@ pub fn award_coins_combo(
     card_icon: CardIcon,
     amount: u8,
 ) -> u8 {
-    let player = players.get(player_turn).expect("Player to be in bounds.");
+    let player = players.get(player_turn).expect("Player to be in boundsyy.");
     let card_count: u8 = player
         .cards
         .iter()
@@ -111,6 +112,17 @@ pub fn buy_card_from_deck(
     remove_card_from_stack(card, 1);
     take_coins(players, player_turn, card.get_cost());
     add_player_card(players, player_turn, card_kind, 1);
+}
+
+pub fn buy_landmark(players: &mut Vec<Player>, player_turn: usize, landmark_kind: LandmarkKind) {
+    take_coins(players, player_turn, get_landmark_cost(&landmark_kind));
+    let player_mut = players
+        .get_mut(player_turn)
+        .expect("Player to be in bounds.");
+    if player_mut.landmarks.contains(&landmark_kind) {
+        panic!("Expected to not duplicate a landmark.");
+    }
+    player_mut.landmarks.push(landmark_kind);
 }
 
 pub fn add_player_card(
@@ -358,6 +370,7 @@ mod tests {
                     },
                     kind,
                 }),
+                landmarks: vec![],
                 name: String::from(""),
                 kind: PlayerKind::Human,
                 turn: 0,
@@ -374,6 +387,7 @@ mod tests {
                     },
                     kind,
                 }),
+                landmarks: vec![],
                 name: String::from(""),
                 kind: PlayerKind::Human,
                 turn: 1,
@@ -388,6 +402,7 @@ mod tests {
                     },
                     kind,
                 }),
+                landmarks: vec![],
                 name: String::from(""),
                 kind: PlayerKind::Human,
                 turn: 2,
@@ -401,6 +416,7 @@ mod tests {
                     },
                     kind,
                 }),
+                landmarks: vec![],
                 name: String::from(""),
                 kind: PlayerKind::Human,
                 turn: 3,

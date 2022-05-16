@@ -1,4 +1,4 @@
-use super::controller::Deck;
+use super::{controller::Deck, landmarks::LandmarkKind};
 
 #[derive(Clone)]
 pub enum PlayerKind {
@@ -13,6 +13,7 @@ pub struct Player {
     pub turn: usize,
     pub cards: Deck,
     pub coins: u8,
+    pub landmarks: Vec<LandmarkKind>,
 }
 
 impl Player {
