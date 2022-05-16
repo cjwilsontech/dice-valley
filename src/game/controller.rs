@@ -1,4 +1,5 @@
 use rand::Rng;
+use std::cmp::Ordering;
 
 use super::{
     cards::{CardIcon, CardKind, CardStack, ALL_CARDS, CARD_KIND_COUNT},
@@ -168,7 +169,13 @@ pub fn get_activatable_cards(
                 .collect::<Vec<PlayerCardStack>>()
         })
         .collect::<Vec<PlayerCardStack>>();
-    activatable_cards.sort_by_key(|x| x.card.get_order());
+
+    // Primary sort by card class order.
+    activatable_cards.sort_by(|a, b| match a.card.get_order().cmp(&b.card.get_order()) {
+        // Secondary sort by reverse turn order.
+        Ordering::Equal => b.owner_turn.cmp(&a.owner_turn),
+        other => other,
+    });
     activatable_cards
 }
 
@@ -238,10 +245,13 @@ mod tests {
         let card_activations = get_activatable_cards(3, 0, &get_players());
         assert_eq!(card_activations[0].card.kind, CardKind::Cafe);
         assert_eq!(card_activations[0].card.count, 1);
-        assert_eq!(card_activations[0].owner_turn, 1);
-        assert_eq!(card_activations[1].card.kind, CardKind::Bakery);
+        assert_eq!(card_activations[0].owner_turn, 3);
+        assert_eq!(card_activations[1].card.kind, CardKind::Cafe);
         assert_eq!(card_activations[1].card.count, 1);
-        assert_eq!(card_activations[1].owner_turn, 0);
+        assert_eq!(card_activations[1].owner_turn, 1);
+        assert_eq!(card_activations[2].card.kind, CardKind::Bakery);
+        assert_eq!(card_activations[2].card.count, 1);
+        assert_eq!(card_activations[2].owner_turn, 0);
     }
 
     #[test]
@@ -382,6 +392,19 @@ mod tests {
                 kind: PlayerKind::Human,
                 turn: 2,
                 coins: 3,
+            },
+            Player {
+                cards: ALL_CARDS.map(|kind| CardStack {
+                    count: match kind {
+                        CardKind::Bakery | CardKind::WheatField | CardKind::Cafe => 1,
+                        _ => 0,
+                    },
+                    kind,
+                }),
+                name: String::from(""),
+                kind: PlayerKind::Human,
+                turn: 3,
+                coins: 0,
             },
         ]
     }
