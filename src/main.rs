@@ -9,7 +9,6 @@ use crate::game::{
         trade_establishments,
     },
     landmarks::LandmarkKind,
-    player::PlayerKind,
 };
 
 pub const MAX_PLAYER_COUNT: usize = 4;
@@ -25,22 +24,17 @@ fn main() {
         let player = players.get(current_turn).expect("Player to not be OOB.");
         ui::start_player_turn(&player);
 
-        let number_of_dice = match player.kind {
-            PlayerKind::Human => {
-                if player.landmarks.contains(&LandmarkKind::TrainStation) {
-                    ui::get_number_of_dice(true)
-                } else {
-                    1
-                }
-            }
-            PlayerKind::Computer => 1,
+        let number_of_dice = if player.landmarks.contains(&LandmarkKind::TrainStation) {
+            player.get_number_of_dice()
+        } else {
+            1
         };
 
         let (mut first_die, mut second_die) = roll_dice(number_of_dice == 2);
         let mut roll_total = first_die + second_die.unwrap_or_default();
         ui::roll_result(first_die, second_die, roll_total);
 
-        if player.landmarks.contains(&LandmarkKind::RadioTower) && ui::ask_reroll() {
+        if player.landmarks.contains(&LandmarkKind::RadioTower) && player.ask_reroll() {
             (first_die, second_die) = roll_dice(number_of_dice == 2);
             roll_total = first_die + second_die.unwrap_or_default();
             ui::roll_result(first_die, second_die, roll_total);
@@ -70,11 +64,9 @@ fn main() {
                         award_coins(&mut players, card_stack.owner_turn, 1 + shopping_mall_bonus)
                     }
                     CardKind::BusinessCenter => {
+                        let player = players.get(current_turn).expect("Player to not be OOB.");
                         let (other_player, other_player_card_kind, player_card_kind) =
-                            ui::get_player_to_trade_establishment_with(
-                                &players,
-                                card_stack.owner_turn,
-                            );
+                            player.get_trade_establishments(&players, card_stack.owner_turn);
                         trade_establishments(
                             &mut players,
                             card_stack.owner_turn,
@@ -115,8 +107,12 @@ fn main() {
                         steal_coins_from_all(&mut players, card_stack.owner_turn, player_count, 2)
                     }
                     CardKind::TvStation => {
-                        let from_player =
-                            ui::get_player_to_steal_coins_from(&players, card_stack.owner_turn, 5);
+                        let player = players.get(current_turn).expect("Player to not be OOB.");
+                        let from_player = player.get_player_to_steal_coins_from(
+                            &players,
+                            card_stack.owner_turn,
+                            5,
+                        );
                         steal_coins(&mut players, from_player, card_stack.owner_turn, 5)
                     }
                     CardKind::WheatField => award_coins(&mut players, card_stack.owner_turn, 1),
@@ -127,7 +123,7 @@ fn main() {
         let player = players.get(current_turn).expect("Player to not be OOB.");
         ui::share_post_distribution_results(player.coins, before_coins);
 
-        let purchase_decision = ui::buy_a_card(&card_deck, &player);
+        let purchase_decision = player.buy_a_card(&card_deck);
         if purchase_decision.is_some() {
             let (card_purchase, landmark_purchase) = purchase_decision.unwrap();
             match card_purchase {
