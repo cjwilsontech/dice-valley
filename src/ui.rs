@@ -340,7 +340,7 @@ fn get_player_kind() -> PlayerKind {
     loop {
         println!("Human or computer (h, c):");
         return match get_input().trim().to_lowercase().as_str() {
-            "c" => PlayerKind::Computer,
+            "c" => PlayerKind::RandomAI,
             "h" => PlayerKind::Human,
             _ => continue,
         };
