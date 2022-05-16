@@ -257,20 +257,17 @@ fn print_landmark_information(index: usize, landmark: &LandmarkKind) {
 fn get_player_except(players: &Vec<Player>, except_player_turn: usize) -> usize {
     let player_options: Vec<(usize, String, u8)> = players
         .iter()
+        .filter(|player| player.turn != except_player_turn)
         .enumerate()
-        .filter_map(|(index, player)| {
-            if player.turn != except_player_turn {
-                println!(
-                    "{}: {} [{} coins, {} cards]",
-                    index,
-                    player.name,
-                    player.coins,
-                    player.cards.map(|card| card.count).iter().sum::<u8>()
-                );
-                Some((player.turn, player.name.clone(), player.coins))
-            } else {
-                None
-            }
+        .map(|(index, player)| {
+            println!(
+                "{}: {} [{} coins, {} cards]",
+                index,
+                player.name,
+                player.coins,
+                player.cards.map(|card| card.count).iter().sum::<u8>()
+            );
+            (player.turn, player.name.clone(), player.coins)
         })
         .collect();
 
