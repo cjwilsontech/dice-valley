@@ -196,4 +196,22 @@ impl CardStack {
             CardKind::FruitAndVegetableMarket => "If this is your turn, get 2 coins from the bank for each Wheat establishment that you own.",
         }
     }
+
+    pub fn get_activation_description(&self) -> &'static str {
+        match self.kind {
+            CardKind::WheatField => "1",
+            CardKind::Ranch => "2",
+            CardKind::Bakery => "2-3",
+            CardKind::Cafe => "3",
+            CardKind::ConvenienceStore => "4",
+            CardKind::Forest => "5",
+            CardKind::Stadium | CardKind::TvStation | CardKind::BusinessCenter => "6",
+            CardKind::CheeseFactory => "7",
+            CardKind::FurnitureFactory => "8",
+            CardKind::Mine => "9",
+            CardKind::FamilyRestaurant => "9-10",
+            CardKind::AppleOrchard => "10",
+            CardKind::FruitAndVegetableMarket => "11-12",
+        }
+    }
 }

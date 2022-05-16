@@ -125,22 +125,8 @@ pub fn buy_a_card(
 
     // Print regular cards.
     let mut index: usize = 0;
-    for card in card_deck.iter() {
-        let player_card_count: u8 = match player.cards.iter().find(|c| c.kind == card.kind) {
-            Some(c) => c.count,
-            None => 0,
-        };
-        println!(
-            "{}: {} [have {}, {} left] Cost: {}, Class: {}, Icon: {}, {}",
-            index,
-            card.get_title(),
-            player_card_count,
-            card.count,
-            card.get_cost(),
-            card.get_order_title(),
-            card.get_icon_title(),
-            card.get_description()
-        );
+    for card_stack in card_deck.iter() {
+        print_card_stats(index, card_stack, player);
         index += 1;
     }
 
@@ -293,6 +279,25 @@ fn get_player_except(players: &Vec<Player>, except_player_turn: usize) -> usize 
     }
 }
 
+fn print_card_stats(index: usize, card_stack: &CardStack, player: &Player) {
+    let player_card_count = match player.cards.iter().find(|c| c.kind == card_stack.kind) {
+        Some(c) => c.count,
+        None => 0,
+    };
+    println!(
+        "{}: {} [have {}, {} left] Activates on {}, Cost: {}, Class: {}, Icon: {}, {}",
+        index,
+        card_stack.get_title(),
+        player_card_count,
+        card_stack.count,
+        card_stack.get_activation_description(),
+        card_stack.get_cost(),
+        card_stack.get_order_title(),
+        card_stack.get_icon_title(),
+        card_stack.get_description()
+    );
+}
+
 fn get_card_kind(player: &Player) -> CardKind {
     let card_options: Vec<CardStack> = player
         .cards
@@ -301,14 +306,7 @@ fn get_card_kind(player: &Player) -> CardKind {
         .collect();
 
     for (index, card_stack) in card_options.iter().enumerate() {
-        println!(
-            "{}: {} (Class: {}, Cost: {}, Kind: {})",
-            index,
-            card_stack.get_title(),
-            card_stack.get_icon_title(),
-            card_stack.get_cost(),
-            card_stack.get_order_title()
-        );
+        print_card_stats(index, card_stack, player);
     }
     println!("Which card would you like to choose:");
 
