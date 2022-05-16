@@ -1,7 +1,7 @@
 use crate::{
     game::{
         cards::{CardKind, CardStack},
-        controller::{create_player_deck, Deck},
+        controller::{create_player_deck, Deck, PlayerCardStack},
         player::{Player, PlayerKind},
     },
     MAX_PLAYER_COUNT,
@@ -49,11 +49,12 @@ pub fn get_number_of_dice(can_roll_two_dice: bool) -> u8 {
 }
 
 pub fn start_player_turn(player: &Player) {
-    println!("");
+    println!();
     println!("It's {}'s ({}) turn.", player.name, player.get_kind_name());
 }
 
 pub fn roll_result(first: u8, second: Option<u8>, total: u8) {
+    println!();
     match second {
         Some(second) => println!("Rolled {} and {} for {}", first, second, total),
         None => println!("Rolled {}", first),
@@ -107,7 +108,7 @@ pub fn share_post_distribution_results(current_coins: u8, before_coins: u8) {
 }
 
 pub fn buy_a_card(card_deck: &Deck, coins: u8) -> Option<CardKind> {
-    println!("");
+    println!();
     println!("Available cards");
     for (index, card) in card_deck.iter().enumerate() {
         println!(
@@ -154,6 +155,22 @@ pub fn buy_a_card(card_deck: &Deck, coins: u8) -> Option<CardKind> {
                 }
             },
         };
+    }
+}
+
+pub fn show_activated_cards(cards: &Vec<PlayerCardStack>) {
+    if cards.is_empty() {
+        println!("No cards activated this turn.");
+    } else {
+        let mut unique_cards = cards.to_vec();
+        unique_cards.sort_by_key(|card| card.card.kind);
+        unique_cards.dedup_by_key(|card| card.card.kind);
+
+        print!("Cards activated this turn:");
+        for card in unique_cards.iter() {
+            print!(" {}", card.card.get_title());
+        }
+        println!();
     }
 }
 

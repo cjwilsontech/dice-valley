@@ -33,6 +33,7 @@ fn main() {
         ui::roll_result(first_die, second_die, roll_total);
 
         let activatable_cards = get_activatable_cards(roll_total, current_turn, &players);
+        ui::show_activated_cards(&activatable_cards);
 
         let before_coins = player.coins;
         for card in activatable_cards {

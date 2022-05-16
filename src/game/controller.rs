@@ -8,6 +8,7 @@ use super::{
 pub type Deck = [CardStack; CARD_KIND_COUNT];
 
 // A CardStack owned by the specified player.
+#[derive(Clone)]
 pub struct PlayerCardStack {
     pub owner_turn: usize,
     pub card: CardStack,

@@ -1,6 +1,6 @@
 pub const CARD_KIND_COUNT: usize = 15;
 
-#[derive(Debug, PartialEq, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum CardKind {
     WheatField,
     Ranch,
