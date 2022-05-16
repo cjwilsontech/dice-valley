@@ -86,7 +86,7 @@ fn main() {
         let player = players.get(current_turn).expect("Player to not be OOB.");
         ui::share_post_distribution_results(player.coins, before_coins);
 
-        let purchase_decision = ui::buy_a_card(&card_deck, player.coins);
+        let purchase_decision = ui::buy_a_card(&card_deck, &player);
         if purchase_decision.is_some() {
             buy_card_from_deck(
                 &mut players,

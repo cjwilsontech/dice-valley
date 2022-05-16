@@ -107,21 +107,27 @@ pub fn share_post_distribution_results(current_coins: u8, before_coins: u8) {
     );
 }
 
-pub fn buy_a_card(card_deck: &Deck, coins: u8) -> Option<CardKind> {
-    if coins == 0 {
+pub fn buy_a_card(card_deck: &Deck, player: &Player) -> Option<CardKind> {
+    if player.coins == 0 {
         return None;
     }
 
     println!();
     println!("Available cards");
     for (index, card) in card_deck.iter().enumerate() {
+        let player_card_count: u8 = match player.cards.iter().find(|c| c.kind == card.kind) {
+            Some(c) => c.count,
+            None => 0,
+        };
         println!(
-            "{}: {} C: {}, I: {}, O: {}, D: {}",
+            "{}: {} [have {}, {} left] Cost: {}, Class: {}, Icon: {}, Description: {}",
             index,
             card.get_title(),
+            player_card_count,
+            card.count,
             card.get_cost(),
-            card.get_icon_title(),
             card.get_order_title(),
+            card.get_icon_title(),
             "Description coming soon!"
         );
     }
@@ -142,10 +148,10 @@ pub fn buy_a_card(card_deck: &Deck, coins: u8) -> Option<CardKind> {
                     }
 
                     let cost = card.get_cost();
-                    if coins < cost {
+                    if player.coins < cost {
                         println!(
                             "Sorry, you only have {} coins but need {}. Please select another option:",
-                            coins,
+                            player.coins,
                             cost
                         );
                         continue;
@@ -224,7 +230,7 @@ fn get_card_kind(player: &Player) -> CardKind {
 
     for (index, card_stack) in card_options.iter().enumerate() {
         println!(
-            "{}: {} (Icon: {}, Cost: {}, Kind: {})",
+            "{}: {} (Class: {}, Cost: {}, Kind: {})",
             index,
             card_stack.get_title(),
             card_stack.get_icon_title(),
