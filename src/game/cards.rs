@@ -63,6 +63,19 @@ pub struct CardStack {
     pub count: u8,
 }
 
+pub fn get_card_icon(card_kind: CardKind) -> CardIcon {
+    match card_kind {
+        CardKind::AppleOrchard | CardKind::WheatField => CardIcon::Wheat,
+        CardKind::Bakery | CardKind::ConvenienceStore => CardIcon::Bread,
+        CardKind::Ranch => CardIcon::Cow,
+        CardKind::Cafe | CardKind::FamilyRestaurant => CardIcon::Cup,
+        CardKind::Forest | CardKind::Mine => CardIcon::Gear,
+        CardKind::BusinessCenter | CardKind::Stadium | CardKind::TvStation => CardIcon::Major,
+        CardKind::CheeseFactory | CardKind::FurnitureFactory => CardIcon::Factory,
+        CardKind::FruitAndVegetableMarket => CardIcon::Fruit,
+    }
+}
+
 impl CardStack {
     pub fn test_activation(&self, roll: u8, is_current_turn: bool) -> bool {
         (match self.kind {
@@ -130,16 +143,7 @@ impl CardStack {
     }
 
     pub fn get_icon(&self) -> CardIcon {
-        match self.kind {
-            CardKind::AppleOrchard | CardKind::WheatField => CardIcon::Wheat,
-            CardKind::Bakery | CardKind::ConvenienceStore => CardIcon::Bread,
-            CardKind::Ranch => CardIcon::Cow,
-            CardKind::Cafe | CardKind::FamilyRestaurant => CardIcon::Cup,
-            CardKind::Forest | CardKind::Mine => CardIcon::Gear,
-            CardKind::BusinessCenter | CardKind::Stadium | CardKind::TvStation => CardIcon::Major,
-            CardKind::CheeseFactory | CardKind::FurnitureFactory => CardIcon::Factory,
-            CardKind::FruitAndVegetableMarket => CardIcon::Fruit,
-        }
+        get_card_icon(self.kind)
     }
 
     pub fn get_icon_title(&self) -> &'static str {

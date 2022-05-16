@@ -2,7 +2,7 @@ use rand::Rng;
 use std::cmp::Ordering;
 
 use super::{
-    cards::{CardIcon, CardKind, CardStack, ALL_CARDS, CARD_KIND_COUNT},
+    cards::{get_card_icon, CardIcon, CardKind, CardStack, ALL_CARDS, CARD_KIND_COUNT},
     landmarks::{get_landmark_cost, LandmarkKind, ALL_LANDMARKS},
     player::Player,
 };
@@ -93,6 +93,12 @@ pub fn trade_establishments(
     player_card_kind: CardKind,
     other_player_card_kind: CardKind,
 ) {
+    if get_card_icon(player_card_kind) == CardIcon::Major
+        || get_card_icon(other_player_card_kind) == CardIcon::Major
+    {
+        panic!("Should not be able to trade Major establishments.");
+    }
+
     remove_player_card(players, player_turn, player_card_kind, 1);
     remove_player_card(players, other_player_turn, other_player_card_kind, 1);
     add_player_card(players, player_turn, other_player_card_kind, 1);
@@ -244,7 +250,7 @@ mod tests {
 
     use super::{
         award_coins_combo, buy_card_from_deck, create_deck, get_activatable_cards, steal_coins,
-        steal_coins_from_all, trade_establishments,
+        steal_coins_from_all, trade_establishments, Deck,
     };
 
     #[test]
@@ -337,10 +343,35 @@ mod tests {
             CardKind::Bakery,
             CardKind::FamilyRestaurant,
         );
-        assert_eq!(players[2].cards[6].count, 1);
-        assert_eq!(players[2].cards[1].count, 0);
-        assert_eq!(players[1].cards[6].count, 0);
-        assert_eq!(players[1].cards[1].count, 2);
+        assert_eq!(
+            find_card_in_deck(&players[2].cards, CardKind::Bakery).count,
+            0
+        );
+        assert_eq!(
+            find_card_in_deck(&players[2].cards, CardKind::FamilyRestaurant).count,
+            1
+        );
+        assert_eq!(
+            find_card_in_deck(&players[1].cards, CardKind::FamilyRestaurant).count,
+            0
+        );
+        assert_eq!(
+            find_card_in_deck(&players[1].cards, CardKind::Bakery).count,
+            2
+        );
+    }
+
+    #[test]
+    #[should_panic(expected = "Should not be able to trade Major establishments.")]
+    fn test_trade_major_establishments() {
+        let mut players = get_players();
+        trade_establishments(
+            &mut players,
+            3,
+            0,
+            CardKind::BusinessCenter,
+            CardKind::WheatField,
+        );
     }
 
     #[test]
@@ -348,10 +379,11 @@ mod tests {
         let mut players = get_players();
         let mut card_deck = create_deck();
         buy_card_from_deck(&mut players, 2, &mut card_deck, CardKind::AppleOrchard);
-        assert_eq!(players[2].cards[0].count, 1);
-        assert_eq!(players[2].cards[0].kind, CardKind::AppleOrchard);
+        let card = find_card_in_deck(&players[2].cards, CardKind::AppleOrchard);
+        let card_deck = find_card_in_deck(&card_deck, CardKind::AppleOrchard);
+        assert_eq!(card.count, 1);
         assert_eq!(players[2].coins, 0);
-        assert_eq!(card_deck[0].count, 5);
+        assert_eq!(card_deck.count, 5);
     }
 
     #[test]
@@ -359,10 +391,17 @@ mod tests {
         let mut players = get_players();
         let mut card_deck = create_deck();
         buy_card_from_deck(&mut players, 2, &mut card_deck, CardKind::WheatField);
-        assert_eq!(players[2].cards[14].count, 4);
-        assert_eq!(players[2].cards[14].kind, CardKind::WheatField);
+        let card = find_card_in_deck(&players[2].cards, CardKind::WheatField);
+        let card_deck = find_card_in_deck(&card_deck, CardKind::WheatField);
+        assert_eq!(card.count, 4);
         assert_eq!(players[2].coins, 2);
-        assert_eq!(card_deck[14].count, 5);
+        assert_eq!(card_deck.count, 5);
+    }
+
+    fn find_card_in_deck(deck: &Deck, card_kind: CardKind) -> &CardStack {
+        deck.iter()
+            .find(|card| card.kind == card_kind)
+            .expect("To find the card.")
     }
 
     fn get_players() -> Vec<Player> {
@@ -417,7 +456,10 @@ mod tests {
             Player {
                 cards: ALL_CARDS.map(|kind| CardStack {
                     count: match kind {
-                        CardKind::Bakery | CardKind::WheatField | CardKind::Cafe => 1,
+                        CardKind::Bakery
+                        | CardKind::WheatField
+                        | CardKind::Cafe
+                        | CardKind::BusinessCenter => 1,
                         _ => 0,
                     },
                     kind,

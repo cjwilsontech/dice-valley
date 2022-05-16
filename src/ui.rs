@@ -1,6 +1,6 @@
 use crate::{
     game::{
-        cards::{CardKind, CardStack, CARD_KIND_COUNT},
+        cards::{CardIcon, CardKind, CardStack, CARD_KIND_COUNT},
         controller::{create_player_deck, Deck, PlayerCardStack},
         landmarks::{
             get_landmark_cost, get_landmark_description, get_landmark_title, LandmarkKind,
@@ -89,12 +89,12 @@ pub fn get_player_to_trade_establishment_with(
         let other_player = players
             .get(other_player_number)
             .expect("Selected player to not be OOB");
-        let other_player_card = get_card_kind(&other_player);
+        let other_player_card = get_non_major_card_kind(&other_player);
 
         let current_player = players
             .get(player_turn)
             .expect("Selected player to not be OOB");
-        let player_card = get_card_kind(&current_player);
+        let player_card = get_non_major_card_kind(&current_player);
 
         return (other_player.turn, other_player_card, player_card);
     }
@@ -310,11 +310,11 @@ fn print_card_stats(index: usize, card_stack: &CardStack, player: &Player) {
     );
 }
 
-fn get_card_kind(player: &Player) -> CardKind {
+fn get_non_major_card_kind(player: &Player) -> CardKind {
     let card_options: Vec<CardStack> = player
         .cards
         .into_iter()
-        .filter(|card| card.count > 0)
+        .filter(|card| card.count > 0 && card.get_icon() != CardIcon::Major)
         .collect();
 
     for (index, card_stack) in card_options.iter().enumerate() {
