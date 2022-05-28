@@ -140,15 +140,15 @@ fn main() {
         }
 
         let player = players.get(current_turn).expect("Player to not be OOB.");
+        if has_player_won(player) {
+            ui::player_has_won(player);
+            break;
+        }
+
         if player.landmarks.contains(&LandmarkKind::AmusementPark) && Some(first_die) == second_die
         {
             ui::amusement_park_turn();
             continue;
-        }
-
-        if has_player_won(player) {
-            ui::player_has_won(player);
-            break;
         }
 
         current_turn += 1;
