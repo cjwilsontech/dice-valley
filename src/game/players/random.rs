@@ -6,9 +6,9 @@ use crate::game::{
 };
 use rand::Rng;
 
-pub fn get_number_of_dice() -> u8 {
+pub fn get_roll_two_dice() -> bool {
     let mut rng = rand::thread_rng();
-    rng.gen_range(1..=6)
+    rng.gen_bool(0.5)
 }
 
 pub fn ask_reroll() -> bool {

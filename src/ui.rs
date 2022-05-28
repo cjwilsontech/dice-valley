@@ -30,16 +30,13 @@ pub fn get_players() -> (Vec<Player>, usize) {
     (players, player_count)
 }
 
-pub fn get_number_of_dice(can_roll_two_dice: bool) -> u8 {
-    if !can_roll_two_dice {
-        return 1;
-    }
-
+pub fn get_roll_two_dice() -> bool {
     println!("How many dice will you roll: (1-2):");
     loop {
         return match get_input().trim().parse() {
             Ok(num) => match num {
-                1 | 2 => num,
+                1 => false,
+                2 => true,
                 _ => {
                     println!("Please specify between 1 and 2 dice:");
                     continue;

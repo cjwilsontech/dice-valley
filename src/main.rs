@@ -24,18 +24,18 @@ fn main() {
         let player = players.get(current_turn).expect("Player to not be OOB.");
         ui::start_player_turn(&player);
 
-        let number_of_dice = if player.landmarks.contains(&LandmarkKind::TrainStation) {
-            player.get_number_of_dice()
+        let should_roll_two_dice = if player.landmarks.contains(&LandmarkKind::TrainStation) {
+            player.get_roll_two_dice()
         } else {
-            1
+            false
         };
 
-        let (mut first_die, mut second_die) = roll_dice(number_of_dice == 2);
+        let (mut first_die, mut second_die) = roll_dice(should_roll_two_dice);
         let mut roll_total = first_die + second_die.unwrap_or_default();
         ui::roll_result(first_die, second_die, roll_total);
 
         if player.landmarks.contains(&LandmarkKind::RadioTower) && player.ask_reroll() {
-            (first_die, second_die) = roll_dice(number_of_dice == 2);
+            (first_die, second_die) = roll_dice(should_roll_two_dice);
             roll_total = first_die + second_die.unwrap_or_default();
             ui::roll_result(first_die, second_die, roll_total);
         }

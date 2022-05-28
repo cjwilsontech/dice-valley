@@ -29,10 +29,10 @@ impl Player {
         }
     }
 
-    pub fn get_number_of_dice(&self) -> u8 {
+    pub fn get_roll_two_dice(&self) -> bool {
         match self.kind {
-            PlayerKind::RandomAI => random::get_number_of_dice(),
-            PlayerKind::Human => human::get_number_of_dice(),
+            PlayerKind::RandomAI => random::get_roll_two_dice(),
+            PlayerKind::Human => human::get_roll_two_dice(),
         }
     }
     pub fn ask_reroll(&self) -> bool {

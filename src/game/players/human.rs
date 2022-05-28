@@ -3,8 +3,8 @@ use crate::{
     ui,
 };
 
-pub fn get_number_of_dice() -> u8 {
-    ui::get_number_of_dice(true)
+pub fn get_roll_two_dice() -> bool {
+    ui::get_roll_two_dice()
 }
 
 pub fn ask_reroll() -> bool {
