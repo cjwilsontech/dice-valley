@@ -1,3 +1,9 @@
+use tabled::{
+    builder::Builder,
+    object::{Columns, Segment},
+    Alignment, Header, MaxWidth, Modify, Style,
+};
+
 use crate::{
     game::{
         cards::{get_card_title, CardIcon, CardKind, CardStack, CARD_KIND_COUNT},
@@ -122,20 +128,62 @@ pub fn buy_a_card(
 
     // Print regular cards.
     let mut index: usize = 0;
-    for card_stack in card_deck.iter() {
-        print_card_stats(index, card_stack, player);
-        index += 1;
-    }
+    let data = card_deck
+        .map(|card_stack| {
+            let player_card_count = match player.cards.iter().find(|c| c.kind == card_stack.kind) {
+                Some(c) => c.count,
+                None => 0,
+            };
+            index += 1;
+            vec![
+                (index - 1).to_string(),
+                card_stack.get_title().to_string(),
+                card_stack.get_cost().to_string(),
+                player_card_count.to_string(),
+                card_stack.count.to_string(),
+                card_stack.get_activation_description().to_string(),
+                card_stack.get_order_title().to_string(),
+                card_stack.get_icon_title().to_string(),
+                card_stack.get_description().to_string(),
+            ]
+        })
+        .to_vec();
+
+    print_table(
+        "Establishments",
+        vec![
+            "#",
+            "Title",
+            "Cost",
+            "Owned",
+            "Available",
+            "Activation",
+            "Class",
+            "Icon",
+            "Description",
+        ],
+        data,
+    );
 
     // Print unbuilt landmarks.
     let available_landmarks: Vec<LandmarkKind> = ALL_LANDMARKS
         .into_iter()
         .filter(|kind| !player.landmarks.contains(&kind))
         .collect();
-    for landmark in &available_landmarks {
-        print_landmark_information(index, &landmark);
-        index += 1;
-    }
+    let data = available_landmarks
+        .iter()
+        .map(|landmark| {
+            index += 1;
+            vec![
+                (index - 1).to_string(),
+                get_landmark_title(landmark).to_string(),
+                get_landmark_cost(landmark).to_string(),
+                get_landmark_description(landmark).to_string(),
+            ]
+        })
+        .collect();
+
+    print_table("Landmarks", vec!["#", "Title", "Cost", "Description"], data);
 
     println!("Would you like to buy a card? (#, n):");
 
@@ -258,32 +306,37 @@ pub fn player_has_won(player: &Player) {
     );
 }
 
-fn print_landmark_information(index: usize, landmark: &LandmarkKind) {
-    println!(
-        "{}: {} [Landmark] Cost: {}, {}",
-        index,
-        get_landmark_title(landmark),
-        get_landmark_cost(landmark),
-        get_landmark_description(landmark)
-    );
-}
-
 fn get_player_except(players: &Vec<Player>, except_player_turn: usize) -> usize {
     let player_options: Vec<(usize, String, u8)> = players
         .iter()
         .filter(|player| player.turn != except_player_turn)
+        .map(|player| (player.turn, player.name.clone(), player.coins))
+        .collect();
+
+    let player_display_options = players
+        .iter()
+        .filter(|player| player.turn != except_player_turn)
         .enumerate()
         .map(|(index, player)| {
-            println!(
-                "{}: {} [{} coins, {} cards]",
-                index,
-                player.name,
-                player.coins,
-                player.cards.map(|card| card.count).iter().sum::<u8>()
-            );
-            (player.turn, player.name.clone(), player.coins)
+            vec![
+                index.to_string(),
+                player.name.clone(),
+                player.coins.to_string(),
+                player
+                    .cards
+                    .map(|card| card.count)
+                    .iter()
+                    .sum::<u8>()
+                    .to_string(),
+            ]
         })
         .collect();
+
+    print_table(
+        "Select a player",
+        vec!["#", "Name", "Coins", "Cards"],
+        player_display_options,
+    );
 
     loop {
         return match get_input().trim().parse::<usize>() {
@@ -302,23 +355,19 @@ fn get_player_except(players: &Vec<Player>, except_player_turn: usize) -> usize 
     }
 }
 
-fn print_card_stats(index: usize, card_stack: &CardStack, player: &Player) {
-    let player_card_count = match player.cards.iter().find(|c| c.kind == card_stack.kind) {
-        Some(c) => c.count,
-        None => 0,
-    };
-    println!(
-        "{}: {} [have {}, {} left] Activates on {}, Cost: {}, Class: {}, Icon: {}, {}",
-        index,
-        card_stack.get_title(),
-        player_card_count,
-        card_stack.count,
-        card_stack.get_activation_description(),
-        card_stack.get_cost(),
-        card_stack.get_order_title(),
-        card_stack.get_icon_title(),
-        card_stack.get_description()
-    );
+fn print_table(header: &str, columns: Vec<&str>, data: Vec<Vec<String>>) {
+    let table = Builder::from(data)
+        .set_columns(columns)
+        .build()
+        .with(Header(header))
+        .with(Style::modern())
+        .with(
+            Modify::new(Segment::all())
+                .with(Alignment::left())
+                .with(Alignment::top()),
+        )
+        .with(Modify::new(Columns::new(0..)).with(MaxWidth::wrapping(70)));
+    println!("{}", table);
 }
 
 fn get_non_major_card_kind(player: &Player) -> CardKind {
@@ -328,9 +377,44 @@ fn get_non_major_card_kind(player: &Player) -> CardKind {
         .filter(|card| card.count > 0 && card.get_icon() != CardIcon::Major)
         .collect();
 
-    for (index, card_stack) in card_options.iter().enumerate() {
-        print_card_stats(index, card_stack, player);
-    }
+    let mut index: usize = 0;
+    let data = card_options
+        .iter()
+        .map(|card_stack| {
+            let player_card_count = match player.cards.iter().find(|c| c.kind == card_stack.kind) {
+                Some(c) => c.count,
+                None => 0,
+            };
+            index += 1;
+            vec![
+                (index - 1).to_string(),
+                card_stack.get_title().to_string(),
+                card_stack.get_cost().to_string(),
+                player_card_count.to_string(),
+                card_stack.count.to_string(),
+                card_stack.get_activation_description().to_string(),
+                card_stack.get_order_title().to_string(),
+                card_stack.get_icon_title().to_string(),
+                card_stack.get_description().to_string(),
+            ]
+        })
+        .collect();
+
+    print_table(
+        "Select an establishment",
+        vec![
+            "#",
+            "Title",
+            "Cost",
+            "Owned",
+            "Available",
+            "Activation",
+            "Class",
+            "Icon",
+            "Description",
+        ],
+        data,
+    );
     println!("Which card would you like to choose:");
 
     loop {
