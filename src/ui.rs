@@ -215,7 +215,7 @@ pub fn buy_a_card(
                         }
 
                         Some((Some(card.kind), None))
-                    } else if selected_index - CARD_KIND_COUNT < LANDMARK_KIND_COUNT {
+                    } else if selected_index - CARD_KIND_COUNT < available_landmarks.len() {
                         let landmark_index = selected_index - CARD_KIND_COUNT;
                         let landmark = available_landmarks
                             .get(landmark_index)
